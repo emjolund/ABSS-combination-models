@@ -1,2 +1,40 @@
 # ABSS-combination-models
-The NetLogo models used in the paper "Combination of Agent-Based Social Simulation Models: A Practical Evaluation using Epidemic Models" (submitted for publication). Further documentation of each of the models will be provided here within short.
+The NetLogo models used in the paper "Combination of Agent-Based Social Simulation Models: A Practical Evaluation using Epidemic Models" (submitted for publication). Due to the large number of models and their simplicity, a full ODD description of each model is not given.  Note that the purpose of these models is to explore and illustrate the combination of different implemented models; they should not be considered suitable to represent any real-world epidemic without proper calibration, verification and validation.
+
+
+## Model Descriptions
+
+### Network
+This model represents individuals in a town as nodes in a network. Each node has the status of either Susceptible, Exposed (i.e., infectious without symptoms), Infected (i.e., infectious with symptoms) or Recovered, and its edges to other nodes represent its contacts. Each time step, exposed and infected agents infect susceptible contacts with a probability set through the interface. The model also allows infections between exposed (though not infected) agents and random non-contact agents, again with a probability defined through the interface.  Agents become Exposed for three days after they are infected, then Infected for another four days, then Recovered for the remainder of the simulation. If population-wide testing is enabled, every agent in the population is tested for the disease every X days (interface-defined), with each agent having a random offset for when this testing occurs. Exposed agents who have tested positive have their disease status changed to Infected, representing them now being aware of their infection and thus changing their behavior as if they had symptoms.
+
+### AgeGroups
+This model (like **Network**) represents individuals in a town as nodes in a network. Each node is assigned one out of four age groups: child, YA (young adult), adult or elderly. Nodes also have the status of either Susceptible, Infected or Recovered, and its edges to other nodes represent its contacts. A Susceptible agent’s risk of infection by an Infected agent depends on its age group; these different infection risks are set through the model’s interface. Agents become Infected for seven days after they are infected, then Recovered for the remainder of the simulation. If population-wide testing is enabled, every agent in the population is tested for the disease every X days (interface-defined), with each agent having a random offset for when this testing occurs. Infected agents who have tested positive are no longer able to infect other agents.
+Differences from **Network**: 
+-	The age groups in **AgeGroups** are not present in **Network**.
+-	**Network** uses an SEIR model for disease progression where **AgeGroups** uses an SIR model.
+-	Infections between non-contact agents can occur in **Network**, but not in **AgeGroups**.
+
+### WorkHome
+**WorkHome**, like the previous two models, describes disease spread in a town. This model assigns each agent to one household and one workplace. Each timestep, infections occur first in workplaces, then within households, with separate infection probabilities set through the interface. Each agent has the disease status of either Susceptible, Infected or recovered. If population-wide testing is enabled, every agent in the population is tested for the disease every X days (interface-defined), with each agent having a random offset for when this testing occurs. An infected agent who has been tested positive no longer visits their workplace and can therefore not infect anyone there; the risk of infecting household contacts remains constant, however. 
+
+### Shopping
+This model describes infections occurring in a store over a single day (1 time step = 5 minutes). The store’s opening and closing hours can be set through the interface. Between these times, agents will visit the store for between five minutes and one hour, some of which are infectious. If there is at least one infectious agent in the store, other agents have a set probability of becoming infected. The total number of agents visiting the store during the day and the number of these that are infectious are set through the interface. The model reports the number of agents that were infected during the simulated day. The models view shows all agents in the simulation: their color reflects their disease state (blue = susceptible, red = infectious, yellow = infected) while their size increases while they are present at the store.
+
+### Country
+This model represents a country or region as a network of cities. Each city has a number of Susceptible, Exposed, Infected and Recovered people (only the quantity of each group is represented). Each day, a set number of people move from their current city to an adjacent one. Next, a number of susceptible individuals are infected based on the number of exposed individuals in the same town. One third of exposed individuals then become infected, and one fourth of previously infected individuals recover. 
+
+### Merged
+This model is the combination of the **Network** and **AgeGroups** models (see the models’ descriptions above). It contains both the SEIR disease progression model and the non-contacts infection risk of **Network** model, and four different age groups of **AgeGroups**. Since **Network** contains several different infection probabilities, the specific age group infection risks have been replaced with a factor per age group by which all infection probabilities are multiplied by. 
+
+### Modules
+This model is based on **Network**, but the possibility for agents to infect non-contacts at random has been removed. Instead, each timestep, the **Shopping** model (described above) is run in full using NetLogo’s LevelSpace. All Susceptible and Exposed agents are assumed to visit the same store. The **Shopping** model outputs the number of new infections having occurred in the store during the day; the same number of Susceptible agents (chosen at random) are then set to Exposed in the town-level simulation. Since agents who have tested positive will have their infection status changed from Exposed to Infected, they will never visit the store. 
+
+### Integration
+This model combines **WorkHome** and **Country** (see the models’ descriptions above), with **WorkHome** simulating one of the towns in **Country** at agent-level. At each time step of the model, the following happens:
+-	**WorkHome** is run one timestep.
+-	**Country** is updated: the town corresponding to the one modeled in **WorkHome** has its number of Susceptible, Exposed, Infected and Recovered individuals changed to match **WorkHome**. The number of timesteps an agent has been Infected in **WorkHome** decides if it is considered Exposed or Infected in **Country**.
+-	**Country** is run one timestep.
+-	**WorkHome** is updated to match the new numbers from **Country**. Infected arrivals from **Country** have their time since infection randomized. 
+
+
+
