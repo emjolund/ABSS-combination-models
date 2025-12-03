@@ -95,18 +95,18 @@ to agents-leave ;;turtle procedure
 end
 
 to progress-disease ;;turtle procedure
-  let infectionsExist 1
-  if num-I = 0 [set infectionsExist 0]
-  let exposed max list infectionsExist round num-E * virus-spread-chance / 100
+  let exposed round (num-E * virus-spread-chance / 100)
   set exposed min list exposed num-S
 
-  let infected round num-E / 3
+  let infected round (num-E / 3)
+  if num-E = 1 [set infected 1]
 
-  let recovered round num-I / 4
+  let recovered round (num-I / 4)
+  if num-I <= 2 and num-I > 0 [set recovered 1]
 
-  set num-S max list 0 (num-S - exposed)
-  set num-E max list 0 (num-E + exposed - infected)
-  set num-I max list 0 (num-I + infected - recovered)
+  set num-S num-S - exposed
+  set num-E num-E + exposed - infected
+  set num-I num-I + infected - recovered
   set num-R num-R + recovered
 
 end
