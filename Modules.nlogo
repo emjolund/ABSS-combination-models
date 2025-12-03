@@ -19,7 +19,7 @@ turtles-own
 to setup
   clear-all
   ls:reset
-  ls:create-models 1 "CombFluStore.nlogo" ;Added the model here
+  ls:create-models 1 "Shopping.nlogo" ;Added the model here
   setup-nodes
   setup-spatially-clustered-network
   ask n-of initial-outbreak-size turtles
@@ -289,7 +289,7 @@ SWITCH
 155
 testing?
 testing?
-0
+1
 1
 -1000
 
@@ -372,7 +372,7 @@ virus-spread-store-risk
 virus-spread-store-risk
 0
 5
-0.0
+0.2
 0.1
 1
 %
